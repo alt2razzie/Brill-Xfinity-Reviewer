@@ -1,4 +1,4 @@
-const CACHE_NAME = 'xfinity-kb-v1';
+const CACHE_NAME = 'brills-xfinity-kb-v2';
 const ASSETS = [
   './',
   './index.html',
