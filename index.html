@@ -1,321 +1,337 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-gray-950">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Brill's Xfinity Notes</title>
   
-  <!-- PWA & Mobile Meta Tags -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#660099">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Brill's Xfinity">
   
-  <!-- Tailwind CSS & FontAwesome Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
   <style>
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-thumb { background: #4a5568; border-radius: 4px; }
-    * { -webkit-tap-highlight-color: transparent; }
+    /* Reset & Base Styles */
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #030712; color: #f3f4f6; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
     
-    .xfinity-gradient {
-      background: linear-gradient(135deg, #660099 0%, #1a0826 100%);
-    }
-    .xfinity-card {
-      background: #161b22;
-      border: 1px solid #30363d;
-    }
-    .badge-purple {
-      background: rgba(102, 0, 153, 0.25);
-      color: #d8b4fe;
-      border: 1px solid rgba(168, 85, 247, 0.4);
-    }
-    .badge-blue {
-      background: rgba(37, 99, 235, 0.25);
-      color: #93c5fd;
-      border: 1px solid rgba(59, 130, 246, 0.4);
-    }
-    .badge-green {
-      background: rgba(16, 185, 129, 0.25);
-      color: #6ee7b7;
-      border: 1px solid rgba(16, 185, 129, 0.4);
-    }
+    /* Utilities */
+    .hidden { display: none !important; }
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .flex-col { flex-direction: column; }
+    .w-full { width: 100%; }
+    
+    /* Theme Colors */
+    .xfinity-gradient { background: linear-gradient(135deg, #660099 0%, #1a0826 100%); }
+    .xfinity-card { background: #111827; border: 1px solid #1f2937; border-radius: 1rem; padding: 1rem; margin-bottom: 1rem; }
+    
+    /* Header */
+    header { position: sticky; top: 0; z-index: 50; padding: 12px 16px; border-bottom: 1px solid rgba(147, 51, 234, 0.3); }
+    .header-container { max-width: 480px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+    
+    /* Search */
+    .search-container { max-width: 480px; margin: 10px auto 0 auto; padding: 0 16px; width: 100%; }
+    .search-input { width: 100%; background: #030712; color: #fff; padding: 10px 12px 10px 38px; border-radius: 12px; border: 1px solid rgba(168, 85, 247, 0.4); outline: none; font-size: 14px; }
+    .search-input:focus { border-color: #c084fc; }
+    .search-icon { position: absolute; left: 28px; top: 13px; color: #9ca3af; font-size: 14px; }
+
+    /* Drawer */
+    #drawerOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+    #drawerOverlay.active { opacity: 1; pointer-events: auto; }
+    #drawerContent { position: fixed; top: 0; left: 0; width: 80%; max-width: 280px; height: 100%; background: #111827; z-index: 101; transform: translateX(-100%); transition: transform 0.3s ease; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; border-right: 1px solid #1f2937; }
+    #drawerContent.active { transform: translateX(0); }
+
+    /* Main Content Area */
+    main { flex: 1; max-width: 480px; width: 100%; margin: 0 auto; padding: 16px; overflow-y: auto; padding-bottom: 80px; }
+    
+    /* Navigation Bar */
+    nav.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(3, 7, 18, 0.95); backdrop-filter: blur(10px); border-top: 1px solid #1f2937; z-index: 40; max-width: 480px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); text-align: center; padding: 8px 0; }
+    .nav-btn { background: none; border: none; color: #9ca3af; font-size: 10px; display: flex; flex-direction: column; align-items: center; cursor: pointer; gap: 4px; }
+    .nav-btn.active { color: #c084fc; }
+    .nav-btn svg { width: 20px; height: 20px; fill: currentColor; }
+
+    /* Buttons & Badges */
+    .badge { display: inline-block; padding: 2px 8px; font-size: 11px; font-weight: 600; border-radius: 9999px; background: rgba(102, 0, 153, 0.3); color: #e9d5ff; border: 1px solid rgba(168, 85, 247, 0.5); margin-bottom: 8px; }
+    h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; color: #fff; }
+    p, li { font-size: 12.5px; line-height: 1.5; color: #d1d5db; }
+    ul { padding-left: 16px; margin-top: 6px; }
+    
+    /* LOB Tabs */
+    .lob-tabs { display: grid; grid-template-columns: repeat(3, 1fr); background: #030712; padding: 3px; border-radius: 10px; margin-bottom: 12px; gap: 4px; }
+    .lob-tab-btn { background: none; border: none; color: #9ca3af; padding: 8px; font-size: 11px; font-weight: 600; border-radius: 8px; cursor: pointer; }
+    .lob-tab-btn.active { background: #7e22ce; color: #fff; }
+
+    /* Accordions */
+    .accordion-btn { width: 100%; background: none; border: none; display: flex; justify-content: space-between; align-items: center; text-align: left; padding: 10px 0; color: #e9d5ff; font-weight: 600; font-size: 13px; cursor: pointer; border-bottom: 1px solid #1f2937; }
   </style>
 </head>
-<body class="h-full text-gray-100 flex flex-col font-sans select-none antialiased pb-20">
+<body>
 
-  <!-- Header & Mobile Navbar -->
-  <header class="xfinity-gradient sticky top-0 z-50 px-4 py-3 shadow-lg border-b border-purple-900/40">
-    <div class="flex items-center justify-between max-w-lg mx-auto">
-      <div class="flex items-center space-x-3">
-        <div class="bg-white/10 p-2 rounded-xl backdrop-blur-md">
-          <i class="fa-solid fa-book-open text-purple-300 text-xl"></i>
+  <!-- Header -->
+  <header class="xfinity-gradient">
+    <div class="header-container">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="background: rgba(255,255,255,0.1); padding: 8px; border-radius: 10px;">
+          <svg style="width:20px; height:20px; fill:#e9d5ff;" viewBox="0 0 24 24"><path d="M4 6H20V8H4V6M4 11H20V13H4V11M4 16H20V18H4V16Z"/></svg>
         </div>
         <div>
-          <h1 class="font-extrabold text-sm tracking-wide text-white leading-tight">BRILL'S XFINITY NOTES</h1>
-          <span class="text-purple-300 font-light text-[10px] block">Enterprise Training & KB Portal</span>
+          <h1 style="font-size: 14px; font-weight: 800; letter-spacing: 0.5px; color: #fff;">BRILL'S XFINITY NOTES</h1>
+          <span style="font-size: 10px; color: #d8b4fe; font-weight: 300;">Enterprise Training & KB</span>
         </div>
       </div>
-      <!-- Hamburger Button with explicit click listener hook -->
-      <button id="menuBtn" class="p-2 text-gray-300 hover:text-white rounded-lg focus:outline-none bg-black/20">
-        <i class="fa-solid fa-bars text-xl"></i>
+      <!-- Hamburger Menu Button -->
+      <button id="menuBtn" style="background: rgba(0,0,0,0.3); border: none; color: #fff; padding: 8px 10px; border-radius: 8px; cursor: pointer;">
+        <svg style="width:22px; height:22px; fill:currentColor;" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
       </button>
     </div>
 
-    <!-- Search Bar -->
-    <div class="mt-3 max-w-lg mx-auto">
-      <div class="relative">
-        <input type="text" id="searchInput" placeholder="Search Internet, Mobile, Retention rules, XB8..." 
-               class="w-full bg-gray-900/90 text-sm text-gray-200 placeholder-gray-400 rounded-xl pl-10 pr-4 py-2 border border-purple-500/30 focus:border-purple-400 focus:outline-none transition-all">
-        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400 text-xs"></i>
-      </div>
+    <!-- Search Input -->
+    <div style="position:relative;" class="search-container">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" class="search-input" placeholder="Search Internet, Mobile, Retention rules...">
     </div>
   </header>
 
-  <!-- Mobile Drawer Menu Overlay -->
-  <div id="drawerOverlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 transition-opacity duration-300 opacity-0 pointer-events-none">
-    <div id="drawerContent" class="w-4/5 max-w-xs bg-gray-900 h-full p-6 shadow-2xl border-r border-gray-800 transform -translate-x-full transition-transform duration-300 flex flex-col justify-between">
-      <div>
-        <div class="flex items-center justify-between pb-4 border-b border-gray-800">
-          <span class="font-bold text-base text-purple-400">Brill's Navigation</span>
-          <button id="closeDrawerBtn" class="text-gray-400 hover:text-white p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
-        </div>
-        <nav class="mt-6 space-y-3">
-          <button data-tab="overview" class="drawer-link w-full text-left text-gray-300 hover:text-purple-400 py-2.5 px-3 rounded-lg hover:bg-gray-800 font-medium flex items-center"><i class="fa-solid fa-circle-info w-6 text-purple-400"></i> Overview & Network</button>
-          <button data-tab="lob" class="drawer-link w-full text-left text-gray-300 hover:text-purple-400 py-2.5 px-3 rounded-lg hover:bg-gray-800 font-medium flex items-center"><i class="fa-solid fa-sitemap w-6 text-purple-400"></i> Lines of Business (LOB)</button>
-          <button data-tab="retention" class="drawer-link w-full text-left text-gray-300 hover:text-purple-400 py-2.5 px-3 rounded-lg hover:bg-gray-800 font-medium flex items-center"><i class="fa-solid fa-shield-heart w-6 text-purple-400"></i> Retention & Churn Playbook</button>
-          <button data-tab="services" class="drawer-link w-full text-left text-gray-300 hover:text-purple-400 py-2.5 px-3 rounded-lg hover:bg-gray-800 font-medium flex items-center"><i class="fa-solid fa-tv w-6 text-purple-400"></i> Core Product Deep-Dive</button>
-          <button data-tab="github-pwa" class="drawer-link w-full text-left text-gray-300 hover:text-purple-400 py-2.5 px-3 rounded-lg hover:bg-gray-800 font-medium flex items-center"><i class="fa-brands fa-github w-6 text-purple-400"></i> GitHub & PWA Setup</button>
-        </nav>
+  <!-- Mobile Drawer Menu -->
+  <div id="drawerOverlay"></div>
+  <div id="drawerContent">
+    <div>
+      <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 16px; border-bottom: 1px solid #1f2937;">
+        <span style="font-weight: bold; color: #c084fc; font-size: 15px;">Brill's Navigation</span>
+        <button id="closeDrawerBtn" style="background:none; border:none; color:#9ca3af; font-size: 20px; cursor:pointer;">✕</button>
       </div>
-      <div class="text-xs text-gray-500 pt-4 border-t border-gray-800 text-center">
-        Brill's Xfinity Notes v2.0
+      <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 8px;">
+        <button data-tab="overview" class="drawer-link" style="text-align:left; background:none; border:none; color:#d1d5db; padding: 10px; border-radius: 8px; font-size: 13px; cursor:pointer; font-weight:500;">📌 Overview & Network</button>
+        <button data-tab="lob" class="drawer-link" style="text-align:left; background:none; border:none; color:#d1d5db; padding: 10px; border-radius: 8px; font-size: 13px; cursor:pointer; font-weight:500;">🏢 Lines of Business (LOB)</button>
+        <button data-tab="retention" class="drawer-link" style="text-align:left; background:none; border:none; color:#d1d5db; padding: 10px; border-radius: 8px; font-size: 13px; cursor:pointer; font-weight:500;">🛡️ Retention & Churn Playbook</button>
+        <button data-tab="services" class="drawer-link" style="text-align:left; background:none; border:none; color:#d1d5db; padding: 10px; border-radius: 8px; font-size: 13px; cursor:pointer; font-weight:500;">📺 Core Product Deep-Dive</button>
+        <button data-tab="github-pwa" class="drawer-link" style="text-align:left; background:none; border:none; color:#d1d5db; padding: 10px; border-radius: 8px; font-size: 13px; cursor:pointer; font-weight:500;">💻 GitHub & PWA Setup</button>
       </div>
+    </div>
+    <div style="font-size: 11px; color: #6b7280; text-align: center; border-top: 1px solid #1f2937; padding-top: 12px;">
+      Brill's Xfinity Notes v2.1
     </div>
   </div>
 
-  <!-- Main Scrollable Content Container -->
-  <main class="flex-1 max-w-lg mx-auto w-full px-4 pt-4 overflow-y-auto space-y-6">
-
-    <!-- Global Search No Results State Message -->
-    <div id="noResults" class="hidden text-center py-12 text-gray-400 text-sm">
-      <i class="fa-solid fa-face-frown text-3xl mb-2 text-purple-400"></i>
-      <p>No matching notes found. Try checking another tab or keyword.</p>
+  <!-- Main Content View -->
+  <main>
+    <div id="noResults" class="hidden" style="text-align: center; padding: 40px 0; color: #9ca3af;">
+      <p>No matching notes found. Try another search term.</p>
     </div>
 
-    <!-- ================= TAB 1: OVERVIEW & INFRASTRUCTURE ================= -->
-    <section id="tab-overview" class="tab-content space-y-4 searchable-section">
-      <div class="xfinity-card rounded-2xl p-4 shadow-sm border border-purple-900/30 searchable-card">
-        <div class="flex items-center justify-between mb-2">
-          <span class="badge-purple text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">Brand Architecture</span>
-          <i class="fa-solid fa-tower-cell text-purple-400"></i>
-        </div>
-        <h2 class="text-xl font-bold text-white mb-2">Comcast & Xfinity Ecosystem</h2>
-        <p class="text-gray-300 text-xs leading-relaxed">
-          Xfinity is the flagship residential brand of Comcast Cable Communications, LLC. Comcast operates North America's largest hybrid fiber-coaxial (HFC) network infrastructure, delivering multi-gigabit broadband, advanced video streaming, smart home security, and nationwide wireless cellular services.
-        </p>
+    <!-- TAB 1: OVERVIEW -->
+    <section id="tab-overview" class="tab-content searchable-section">
+      <div class="xfinity-card searchable-card">
+        <span class="badge">Brand Architecture</span>
+        <h2>Comcast & Xfinity Ecosystem</h2>
+        <p>Xfinity is the flagship residential brand of Comcast Cable Communications, LLC. Comcast operates North America's largest hybrid fiber-coaxial (HFC) network infrastructure, delivering multi-gigabit broadband, advanced video streaming, smart home security, and nationwide wireless cellular services.</p>
       </div>
 
-      <!-- Tech Infrastructure Card -->
-      <div class="xfinity-card rounded-2xl p-4 space-y-3 searchable-card">
-        <h3 class="font-semibold text-sm text-purple-300 uppercase tracking-wider flex items-center gap-2">
-          <i class="fa-solid fa-microchip"></i> Next-Gen Network Infrastructure
-        </h3>
-        <div class="space-y-2 text-xs text-gray-300">
-          <div class="bg-gray-900/80 p-3 rounded-xl border border-gray-800">
-            <h4 class="font-bold text-white mb-1"><i class="fa-solid fa-bolt text-yellow-400 mr-1"></i> DOCSIS 4.0 & 10G Evolution</h4>
-            <p>Comcast is upgrading its HFC network via Full Duplex (FDX) and Extended Spectrum DOCSIS 4.0, providing symmetrical multi-gigabit download and upload speeds without overhauling physical home wiring.</p>
-          </div>
-          <div class="bg-gray-900/80 p-3 rounded-xl border border-gray-800">
-            <h4 class="font-bold text-white mb-1"><i class="fa-solid fa-wifi text-blue-400 mr-1"></i> 23M+ Wi-Fi Hotspot Mesh</h4>
-            <p>Over 23 million public and private Wi-Fi access points nationwide allow Xfinity Mobile and internet clients to automatically offload cellular data traffic securely.</p>
-          </div>
+      <div class="xfinity-card searchable-card">
+        <span class="badge">Infrastructure</span>
+        <h2>DOCSIS 4.0 & 10G Evolution</h2>
+        <p>Comcast is upgrading its HFC network via Full Duplex (FDX) and Extended Spectrum DOCSIS 4.0, providing symmetrical multi-gigabit download and upload speeds without overhauling physical home wiring.</p>
+        <p style="margin-top: 8px;">Over 23 million public and private Wi-Fi access points nationwide allow Xfinity Mobile and internet clients to automatically offload cellular data traffic securely.</p>
+      </div>
+    </section>
+
+    <!-- TAB 2: LOB -->
+    <section id="tab-lob" class="tab-content hidden searchable-section">
+      <div class="xfinity-card searchable-card">
+        <h2>Lines of Business (LOB)</h2>
+        <div class="lob-tabs">
+          <button onclick="switchLOB('res')" id="btn-lob-res" class="lob-tab-btn active">Residential</button>
+          <button onclick="switchLOB('bulk')" id="btn-lob-bulk" class="lob-tab-btn">Bulk / MDU</button>
+          <button onclick="switchLOB('biz')" id="btn-lob-biz" class="lob-tab-btn">Business</button>
+        </div>
+
+        <div id="lob-res" class="lob-panel">
+          <span class="badge">B2C Market</span>
+          <h3 style="color:#fff; font-size:14px; margin-bottom:4px;">Residential Services</h3>
+          <p>Direct consumer packages offering broadband internet, digital entertainment, voice landlines, and mobile lines. Delivered via Self-Install Kits (SIK) or professional truck rolls.</p>
+        </div>
+        <div id="lob-bulk" class="lob-panel hidden">
+          <span class="badge" style="background:rgba(37, 99, 235, 0.3); color:#93c5fd; border-color:rgba(59, 130, 246, 0.5);">MDU Communities</span>
+          <h3 style="color:#fff; font-size:14px; margin-bottom:4px;">Bulk Solutions & HOA</h3>
+          <p>Master-contracted bulk agreements tailored for Multi-Dwelling Units (MDUs), condominium associations, HOAs, and student dormitories with property-wide managed Wi-Fi.</p>
+        </div>
+        <div id="lob-biz" class="lob-panel hidden">
+          <span class="badge" style="background:rgba(16, 185, 129, 0.3); color:#6ee7b7; border-color:rgba(16, 185, 129, 0.5);">Comcast Business</span>
+          <h3 style="color:#fff; font-size:14px; margin-bottom:4px;">Comcast Business & Enterprise</h3>
+          <p>Enterprise-grade connectivity, Ethernet services, and cloud cybersecurity engineered with 99.99% uptime SLAs, 24/7 commercial support, and 4G LTE/5G wireless auto-failover backup.</p>
         </div>
       </div>
     </section>
 
-    <!-- ================= TAB 2: LINES OF BUSINESS (LOB) ================= -->
-    <section id="tab-lob" class="tab-content hidden space-y-4 searchable-section">
-      <div class="xfinity-card rounded-2xl p-4 searchable-card">
-        <h2 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
-          <i class="fa-solid fa-layer-group text-purple-400"></i> Lines of Business (LOB)
-        </h2>
+    <!-- TAB 3: RETENTION -->
+    <section id="tab-retention" class="tab-content hidden searchable-section">
+      <div class="xfinity-card searchable-card">
+        <span class="badge">Customer Loyalty</span>
+        <h2>Retention & Churn Playbook</h2>
+        <p>Standard operating procedures for managing disconnect queues, rate adjustment friction, and customer saving workflows.</p>
+        <ul style="list-style-type: disc;">
+          <li><strong>Root Cause Discovery:</strong> Uncover why the client is cancelling (Promo roll-off price increase, competitor fiber quote, relocation).</li>
+          <li><strong>Account Value Audit:</strong> Review tenure, Xfinity Rewards tier (Silver to Diamond), and hardware age to offer immediate upgrades (e.g., XB8 gateway).</li>
+          <li><strong>Mobile Cross-Sell:</strong> Pitch Xfinity Mobile line transfers to unlock $10 to $20 monthly broadband bundle credits.</li>
+          <li><strong>Right-Sizing:</strong> Match bandwidth usage to appropriate tiers and lock in a 1-year rate guarantee.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- TAB 4: SERVICES -->
+    <section id="tab-services" class="tab-content hidden searchable-section">
+      <div class="xfinity-card searchable-card">
+        <h2>Xfinity Core Product Suite</h2>
         
-        <!-- Segment Buttons -->
-        <div class="grid grid-cols-3 gap-2 bg-gray-900 p-1 rounded-xl mb-4 text-xs font-semibold">
-          <button onclick="switchLOB('res')" id="btn-lob-res" class="py-2 rounded-lg bg-purple-700 text-white transition-all">Residential</button>
-          <button onclick="switchLOB('bulk')" id="btn-lob-bulk" class="py-2 rounded-lg text-gray-400 hover:text-white transition-all">Bulk / MDU</button>
-          <button onclick="switchLOB('biz')" id="btn-lob-biz" class="py-2 rounded-lg text-gray-400 hover:text-white transition-all">Business</button>
+        <button class="accordion-btn" onclick="toggleAccordion('acc-internet')"><span>📶 Internet & Gateways</span> <span>▼</span></button>
+        <div id="acc-internet" class="hidden" style="padding: 8px 0; border-bottom:1px solid #1f2937;">
+          <p><strong>Speeds:</strong> Connect (150 Mbps) up to Gigabit Extra (1200 Mbps).</p>
+          <p style="margin-top:4px;"><strong>Gateways:</strong> XB7 (Wi-Fi 6) and XB8 (Tri-band Wi-Fi 6E with 6 GHz channel support for up to 100 devices).</p>
         </div>
 
-        <!-- Panels -->
-        <div id="lob-res" class="lob-panel space-y-3">
-          <span class="badge-purple text-xs px-2 py-0.5 rounded">Mass Market B2C</span>
-          <h3 class="font-bold text-white text-base">Residential Services</h3>
-          <p class="text-xs text-gray-300 leading-relaxed">
-            Direct consumer packages offering broadband internet, digital entertainment, voice landlines, and mobile lines. Delivered via Self-Install Kits (SIK) or professional truck rolls with promotional price guarantees.
-          </p>
-          <ul class="text-xs text-gray-400 space-y-1 list-disc pl-4">
-            <li>Target Market: Single-family homeowners, individual renters, apartment dwellers.</li>
-            <li>Billing Structure: Monthly recurring billing with e-bill and auto-pay discounts.</li>
-          </ul>
+        <button class="accordion-btn" onclick="toggleAccordion('acc-tv')"><span>📺 X1 TV & NOW Streaming</span> <span>▼</span></button>
+        <div id="acc-tv" class="hidden" style="padding: 8px 0; border-bottom:1px solid #1f2937;">
+          <p><strong>X1 OS:</strong> Voice-controlled platform combining linear cable with Netflix, Prime, Disney+.</p>
+          <p style="margin-top:4px;"><strong>NOW TV:</strong> Contract-free live TV bundle with 45+ channels + Peacock Premium.</p>
         </div>
 
-        <div id="lob-bulk" class="lob-panel hidden space-y-3">
-          <span class="badge-blue text-xs px-2 py-0.5 rounded">MDU / Communities</span>
-          <h3 class="font-bold text-white text-base">Bulk Solutions & MDU Communities</h3>
-          <p class="text-xs text-gray-300 leading-relaxed">
-            Master-contracted bulk agreements tailored for Multi-Dwelling Units (MDUs), condominium associations, HOAs, and student dormitories.
-          </p>
-          <ul class="text-xs text-gray-400 space-y-1 list-disc pl-4">
-            <li><strong>Master HOA Billing:</strong> Property management covers baseline internet/video fees via HOA fees.</li>
-            <li><strong>Resident Add-ons:</strong> Tenants can upgrade speed tiers or buy Xfinity Mobile independently.</li>
-          </ul>
+        <button class="accordion-btn" onclick="toggleAccordion('acc-mobile')"><span>📱 Xfinity Mobile MVNO</span> <span>▼</span></button>
+        <div id="acc-mobile" class="hidden" style="padding: 8px 0; border-bottom:1px solid #1f2937;">
+          <p>Hybrid MVNO running on Verizon's cellular network combined with automatic offloading to 23M+ Xfinity Wi-Fi hotspots.</p>
         </div>
 
-        <div id="lob-biz" class="lob-panel hidden space-y-3">
-          <span class="badge-green text-xs px-2 py-0.5 rounded">Comcast Business</span>
-          <h3 class="font-bold text-white text-base">Comcast Business & Enterprise</h3>
-          <p class="text-xs text-gray-300 leading-relaxed">
-            Enterprise-grade connectivity, Ethernet services, and cloud cybersecurity engineered specifically for small businesses and corporate offices.
-          </p>
-          <ul class="text-xs text-gray-400 space-y-1 list-disc pl-4">
-            <li><strong>SLAs & Support:</strong> 99.99% uptime guarantee with 24/7 dedicated commercial support desks.</li>
-            <li><strong>Wireless Backup:</strong> Cellular 4G LTE/5G auto-failover gateway backup to guarantee 100% uptime.</li>
-          </ul>
+        <button class="accordion-btn" onclick="toggleAccordion('acc-security')"><span>🛡️ Home Security</span> <span>▼</span></button>
+        <div id="acc-security" class="hidden" style="padding: 8px 0;">
+          <p>24/7 professional central station monitoring with cellular backup or self-monitored video storage configurations.</p>
         </div>
       </div>
     </section>
 
-    <!-- ================= TAB 3: RETENTION & CHURN PLAYBOOK ================= -->
-    <section id="tab-retention" class="tab-content hidden space-y-4 searchable-section">
-      <div class="xfinity-card rounded-2xl p-4 searchable-card">
-        <span class="badge-purple text-xs px-2.5 py-1 rounded-full uppercase tracking-wider font-semibold">Customer Loyalty</span>
-        <h2 class="text-xl font-bold text-white mt-2 mb-1">Retention & Churn Playbook</h2>
-        <p class="text-xs text-gray-400 mb-4">Standard operating procedures for managing disconnect queues, rate adjustment friction, and customer saving workflows.</p>
-
-        <div class="space-y-3 text-xs">
-          <div class="bg-gray-900 p-3 rounded-xl border border-gray-800">
-            <div class="flex items-center text-purple-400 font-bold mb-1">
-              <span class="w-5 h-5 bg-purple-900/60 rounded-full flex items-center justify-center text-xs mr-2">1</span>
-              Root Cause Identification
-            </div>
-            <p class="text-gray-300 pl-7">Uncover why the client is cancelling (Promo roll-off price increase, competitor fiber quote, relocation, or intermittent tech trouble).</p>
-          </div>
-
-          <div class="bg-gray-900 p-3 rounded-xl border border-gray-800">
-            <div class="flex items-center text-purple-400 font-bold mb-1">
-              <span class="w-5 h-5 bg-purple-900/60 rounded-full flex items-center justify-center text-xs mr-2">2</span>
-              Account Value Audit
-            </div>
-            <p class="text-gray-300 pl-7">Review account tenure, Xfinity Rewards tier (Silver, Gold, Platinum, Diamond), and active equipment age to offer immediate upgrades (e.g., swapping old gateways for XB8).</p>
-          </div>
-
-          <div class="bg-gray-900 p-3 rounded-xl border border-gray-800">
-            <div class="flex items-center text-purple-400 font-bold mb-1">
-              <span class="w-5 h-5 bg-purple-900/60 rounded-full flex items-center justify-center text-xs mr-2">3</span>
-              Mobile Cross-Sell & Discounting
-            </div>
-            <p class="text-gray-300 pl-7">Combine services by pitching Xfinity Mobile line transfers to unlock $10 to $20 monthly broadband bundle credits.</p>
-          </div>
-
-          <div class="bg-gray-900 p-3 rounded-xl border border-gray-800">
-            <div class="flex items-center text-purple-400 font-bold mb-1">
-              <span class="w-5 h-5 bg-purple-900/60 rounded-full flex items-center justify-center text-xs mr-2">4</span>
-              Right-Sizing & Term Agreement
-            </div>
-            <p class="text-gray-300 pl-7">Match customer bandwidth usage habits to appropriate tiers (e.g., stepping down from Gigabit to 300 Mbps if underutilized) and lock in a 1-year rate guarantee.</p>
-          </div>
-        </div>
+    <!-- TAB 5: GITHUB -->
+    <section id="tab-github-pwa" class="tab-content hidden searchable-section">
+      <div class="xfinity-card searchable-card">
+        <span class="badge" style="background:rgba(37, 99, 235, 0.3); color:#93c5fd; border-color:rgba(59, 130, 246, 0.5);">Deployment</span>
+        <h2>Publishing to GitHub Pages</h2>
+        <p>1. Create your repository with `index.html`, `manifest.json`, and `sw.js`.</p>
+        <p style="margin-top:6px;">2. Run git commit & push commands to your `main` branch.</p>
+        <p style="margin-top:6px;">3. Go to Repo &rarr; Settings &rarr; Pages &rarr; Select `main` branch to make it live instantly!</p>
       </div>
     </section>
+  </main>
 
-    <!-- ================= TAB 4: CORE PRODUCTS DEEP-DIVE ================= -->
-    <section id="tab-services" class="tab-content hidden space-y-4 searchable-section">
-      <div class="xfinity-card rounded-2xl p-4 searchable-card">
-        <h2 class="text-xl font-bold text-white mb-3">Xfinity Core Product Suite</h2>
-        
-        <!-- Accordions -->
-        <div class="border-b border-gray-800 py-3">
-          <button onclick="toggleAccordion('acc-internet')" class="w-full flex items-center justify-between text-left focus:outline-none">
-            <span class="font-bold text-purple-300 text-sm"><i class="fa-solid fa-wifi w-5"></i> Internet & Gateway Hardware</span>
-            <i class="fa-solid fa-chevron-down text-gray-500 text-xs"></i>
-          </button>
-          <div id="acc-internet" class="hidden mt-3 space-y-2 text-xs text-gray-300">
-            <p><strong>Speed Tiers:</strong> Connect (150 Mbps), Connect More (300 Mbps), Fast (500 Mbps), Gigabit (1000 Mbps), Gigabit Extra (1200 Mbps).</p>
-            <p><strong>Gateways:</strong></p>
-            <ul class="list-disc pl-4 text-gray-400 space-y-1">
-              <li><strong>XB7:</strong> Wi-Fi 6 wireless gateway with dual bands and multi-gigabit Ethernet ports.</li>
-              <li><strong>XB8:</strong> Tri-band Wi-Fi 6E gateway featuring a 6 GHz channel for minimal latency and support for up to 100 concurrent devices.</li>
-            </ul>
-          </div>
-        </div>
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <button onclick="switchTab('overview')" id="nav-overview" class="nav-btn active">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+      Overview
+    </button>
+    <button onclick="switchTab('lob')" id="nav-lob" class="nav-btn">
+      <svg viewBox="0 0 24 24"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/></svg>
+      LOB
+    </button>
+    <button onclick="switchTab('retention')" id="nav-retention" class="nav-btn">
+      <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+      Retention
+    </button>
+    <button onclick="switchTab('services')" id="nav-services" class="nav-btn">
+      <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>
+      Products
+    </button>
+    <button onclick="switchTab('github-pwa')" id="nav-github-pwa" class="nav-btn">
+      <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      GitHub
+    </button>
+  </nav>
 
-        <div class="border-b border-gray-800 py-3">
-          <button onclick="toggleAccordion('acc-tv')" class="w-full flex items-center justify-between text-left focus:outline-none">
-            <span class="font-bold text-purple-300 text-sm"><i class="fa-solid fa-tv w-5"></i> X1 Cable, NOW TV & StreamSaver</span>
-            <i class="fa-solid fa-chevron-down text-gray-500 text-xs"></i>
-          </button>
-          <div id="acc-tv" class="hidden mt-3 space-y-2 text-xs text-gray-300">
-            <p><strong>X1 Entertainment OS:</strong> Voice-controlled entertainment platform uniting live cable TV with major streaming applications (Netflix, Prime Video, Hulu, Disney+).</p>
-            <p><strong>NOW TV:</strong> Affordable contract-free live television bundle providing 45+ channels plus Peacock Premium included.</p>
-          </div>
-        </div>
+  <!-- Script Engine -->
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      const target = document.getElementById('tab-' + tabId);
+      if (target) target.classList.remove('hidden');
 
-        <div class="border-b border-gray-800 py-3">
-          <button onclick="toggleAccordion('acc-mobile')" class="w-full flex items-center justify-between text-left focus:outline-none">
-            <span class="font-bold text-purple-300 text-sm"><i class="fa-solid fa-mobile-screen-button w-5"></i> Xfinity Mobile (MVNO)</span>
-            <i class="fa-solid fa-chevron-down text-gray-500 text-xs"></i>
-          </button>
-          <div id="acc-mobile" class="hidden mt-3 space-y-2 text-xs text-gray-300">
-            <p><strong>Network Architecture:</strong> Hybrid MVNO running on Verizon's cellular towers coupled with automatic offloading to 23M+ Xfinity secure Wi-Fi hotspots.</p>
-            <p><strong>Plans:</strong> By the Gig shared data tiers or Unlimited / Unlimited Plus lines.</p>
-          </div>
-        </div>
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      const nav = document.getElementById('nav-' + tabId);
+      if (nav) nav.classList.add('active');
 
-        <div class="py-3">
-          <button onclick="toggleAccordion('acc-security')" class="w-full flex items-center justify-between text-left focus:outline-none">
-            <span class="font-bold text-purple-300 text-sm"><i class="fa-solid fa-shield-halved w-5"></i> Xfinity Home Security</span>
-            <i class="fa-solid fa-chevron-down text-gray-500 text-xs"></i>
-          </button>
-          <div id="acc-security" class="hidden mt-3 space-y-2 text-xs text-gray-300">
-            <p><strong>Monitoring:</strong> 24/7 professional central station monitoring with cellular backup or self-monitored video storage configurations.</p>
-          </div>
-        </div>
-      </div>
-    </section>
+      document.getElementById('searchInput').value = '';
+      resetSearch();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
-    <!-- ================= TAB 5: GITHUB & PWA SETUP GUIDE ================= -->
-    <section id="tab-github-pwa" class="tab-content hidden space-y-4 searchable-section">
-      <div class="xfinity-card rounded-2xl p-4 searchable-card">
-        <span class="badge-blue text-xs px-2.5 py-1 rounded-full uppercase tracking-wider font-semibold">Deployment Manual</span>
-        <h2 class="text-xl font-bold text-white mt-2 mb-2">Publishing to GitHub Pages</h2>
-        
-        <p class="text-xs text-gray-300 mb-4 leading-relaxed">
-          Follow these quick steps to host Brill's Xfinity Notes live on GitHub Pages.
-        </p>
+    function switchLOB(type) {
+      document.querySelectorAll('.lob-panel').forEach(el => el.classList.add('hidden'));
+      const panel = document.getElementById('lob-' + type);
+      if (panel) panel.classList.remove('hidden');
 
-        <div class="space-y-4 text-xs">
-          <div class="bg-gray-900 p-3 rounded-xl border border-gray-800">
-            <h3 class="font-bold text-purple-300 text-sm mb-1">Step 1: File Setup</h3>
-            <pre class="bg-black/60 p-2 rounded text-purple-300 font-mono text-xs overflow-x-auto">
-index.html
-manifest.json
-sw.js</pre>
-          </div>
+      ['res', 'bulk', 'biz'].forEach(t => {
+        const btn = document.getElementById('btn-lob-' + t);
+        if (btn) {
+          if (t === type) btn.classList.add('active');
+          else btn.classList.remove('active');
+        }
+      });
+    }
 
-          <div class="bg-gray-900 p-3 rounded-xl border border-gray-800">
-            <h3 class="font-bold text-purple-300 text-sm mb-1">Step 2: Terminal Git Commands</h3>
-            <pre class="bg-black/60 p-2 rounded text-green-400 font-mono text-xs overflow-x-auto">
-git init
-git add .
-git commit -m "Launch Brills Xfinity Notes"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/brills-xfinity-notes.git
-git push -u origin main</pre>
-          </div>
+    function toggleAccordion(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('hidden');
+    }
 
-          <div class="bg-gray-900 p-3 rounded-xl border border-gray
+    // Drawer Elements
+    const menuBtn = document.getElementById('menuBtn');
+    const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+    const drawerOverlay = document.getElementById('drawerOverlay');
+    const drawerContent = document.getElementById('drawerContent');
+
+    function openDrawer() {
+      drawerOverlay.classList.add('active');
+      drawerContent.classList.add('active');
+    }
+
+    function closeDrawer() {
+      drawerOverlay.classList.remove('active');
+      drawerContent.classList.remove('active');
+    }
+
+    if (menuBtn) menuBtn.onclick = openDrawer;
+    if (closeDrawerBtn) closeDrawerBtn.onclick = closeDrawer;
+    if (drawerOverlay) drawerOverlay.onclick = closeDrawer;
+
+    document.querySelectorAll('.drawer-link').forEach(link => {
+      link.onclick = () => {
+        switchTab(link.getAttribute('data-tab'));
+        closeDrawer();
+      };
+    });
+
+    // Search Engine
+    const searchInput = document.getElementById('searchInput');
+    const noResults = document.getElementById('noResults');
+
+    function resetSearch() {
+      document.querySelectorAll('.searchable-card').forEach(card => card.style.display = '');
+      if (noResults) noResults.classList.add('hidden');
+    }
+
+    if (searchInput) {
+      searchInput.oninput = (e) => {
+        const q = e.target.value.toLowerCase().trim();
+        if (q === '') {
+          resetSearch();
+          return;
+        }
+        let matches = 0;
+        document.querySelectorAll('.searchable-card').forEach(card => {
+          if (card.innerText.toLowerCase().includes(q)) {
+            card.style.display = '';
+            matches++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+        if (matches === 0) {
+          if (noResults) noResults.classList.remove('hidden');
+        } else {
+          if (noResults) noResults.classList.ad
