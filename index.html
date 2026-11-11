@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-950">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Xfinity Product Knowledge & Retention Portal</title>
+  
+  <!-- PWA & Mobile Meta Tags -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#660099">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Xfinity KB">
+  
+  <!-- Tailwind CSS & FontAwesome Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* Custom Scrollbar & Mobile Tap Highlights */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: #4a5568; border-radius: 4px; }
+    * { -webkit-tap-highlight-color: transparent; }
+    
+    .xfinity-gradient {
+      background: linear-gradient(135deg, #660099 0%, #1a0826 100%);
+    }
+    .xfinity-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+    }
+    .badge-purple {
+      background: rgba(102, 0, 153, 0.25);
+      color: #d8b4fe;
+      border: 1px solid rgba(168, 85, 247, 0.4);
+    }
+    .badge-blue {
+      background: rgba(37, 99, 235, 0.25);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.4);
+    }
+    .badge-green {
+      background: rgba(16, 185, 129, 0.25);
+      color: #6ee7b7;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+  </style>
+</head>
+<body class="h-full text-gray-100 flex flex-col font-sans select-none antialiased pb-20">
+
+  <!-- Header & Mobile Navbar -->
+  <header class="xfinity-gradient sticky top-0 z-50 px-4 py-3 shadow-lg border-b border-purple-900/40">
+    <div class="flex items-center justify-between max-w-lg mx-auto">
+      <div class="flex items-center space-x-3">
+        <div class="bg-white/10 p-2 rounded-xl backdrop-blur-md">
+          <i class="fa-solid fa-network-wired text-purple-300 text-xl"></i>
+        </div>
+        <div>
+          <h1 class="font-extrabold text-lg tracking-wide text-white leading-tight">XFINITY <span class="text-purple-400 font-light text-xs block">ENTERPRISE KB</span></h1>
+        </div>
+      </div>
+      <button onclick="toggleMobileMenu()" class="p-2 text-gray-300 hover:text-white rounded-lg focus:outline-none">
+        <i class="fa-solid fa-bars text-xl"></i>
+      </button>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="mt-3 max-w-lg mx-auto">
+      <div class="relative">
+        <input type="text" id="searchInput" onkeyup="filterContent()" placeholder="Search Internet, Mobile, Retention rules, XB8..." 
+               class="w-full bg-gray-900/90 text-sm text-gray-200 placeholder-gray-400 rounded-xl pl-10 pr-4 py-2 border border-purple-500/30 focus:border-purple-400 focus:outline-none transition-all">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-xs"></i>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Menu Overlay -->
+  <div id="drawerOverlay" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden" onclick="toggleMobileMenu()">
+    <div class="w-4/5 max-w-xs bg-gray-900 h-full p-6 shadow-2xl border-r border-gray-800" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between pb-4 border-b border-gray-800">
+        <span class="font-bold text-lg text-purple-400">Navigation</span>
+        <button onclick="toggleMobileMenu()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+      <nav class="mt-6 space-y-4">
+        <a href="#overview" onclick="switchTab('overview'); toggleMobileMenu()" class="block text-gray-300 hover:text-purple-400 py-2 font-medium"><i class="fa-solid fa-circle-info w-6"></i> Overview & Network</a>
+        <a href="#lob" onclick="switchTab('lob'); toggleMobileMenu()" class="block text-gray-300 hover:text-purple-400 py-2 font-medium"><i class="fa-solid fa-sitemap w-6"></i> Lines of Business (LOB)</a>
+        <a href="#retention" onclick="switchTab('retention'); toggleMobileMenu()" class="block text-gray-300 hover:text-purple-400 py-2 font-medium"><i class="fa-solid fa-shield-heart w-6"></i> Retention & Churn Playbook</a>
+        <a href="#services" onclick="switchTab('services'); toggleMobileMenu()" class="block text-gray-300 hover:text-purple-400 py-2 font-medium"><i class="fa-solid fa-tv w-6"></i> Core Product Deep-Dive</a>
+        <a href="#github-pwa" onclick="switchTab('github-pwa'); toggleMobileMenu()" class="block text-gray-300 hover:text-purple-400 py-2 font-medium"><i class="fa-brands fa-github w-6"></i> GitHub & PWA Setup</a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Main Scrollable Content Container -->
+  <main class="flex-1 max-w-lg mx-auto w-full px-4 pt-4 overflow-y-auto space-y-6">
+
+    <!-- ================= TAB 1: OVERVIEW & INFRASTRUCTURE ================= -->
+    <section id="tab-overview" class="tab-content space-y-4">
+      <div class="xfinity-card rounded-2xl p-4 shadow-sm border border-purple-900/30">
+        <div class="flex items-center justify-between mb-2">
+          <span class="badge-purple text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">Brand & Architecture</span>
+          <i class="fa-solid fa-tower-cell text-purple-400"></i>
+        </div>
+        <h2 class="text-xl font-bold text-white mb-2">Xfinity (Comcast) Ecosystem</h2>
+        <p class="text-gray-300 text-xs leading-relaxed">
+          Xfinity is the residential and mass-market flagship brand of Comcast Cable Communications, LLC. Comcast operates the largest hybrid fiber-coaxial (HFC) network in the United States, driving high-speed broadband, next-generation video, home security, and wireless MVNO services.
+        </p>
+      </div>
+
+      <!-- Tech Infrastructure Accordion -->
+      <div class="xfinity-card rounded-2xl p-4 space-y-3">
+        <h3 class="font-semibold text-sm text-purple-300 uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-microchip"></i> Next-Gen Network Infrastructure
+        </h3>
+        <div class="space-y-2 text-xs text-gray-300">
+          <div class="bg-gray-900/80 p-3 rounded-xl border border-gray-800">
+            <h4 class="font-bold text-white mb-1"><i class="fa-solid fa-bolt text-yellow-400 mr-1"></i> DOCSIS 4.0 & 10G Evolution</h4>
+            <p>Comcast is upgrading its HFC footprint to Full Duplex (FDX) and Extended Spectrum DOCSIS 4.0, delivering multi-gigabit symmetrical upload and download speeds without requiring full fiber-to-the-home replacement.</p>
+          </div>
+          <div class="bg-gray-900/80 p-3 rounded-xl border border-gray-800">
+            <h4 class="font-bold text-white mb-1"><i class="fa-solid fa-wifi text-blue-400 mr-1"></i> 23M+ Wi-Fi Hotspot Mesh</h4>
+            <p>Xfinity operates nationwide Wi-Fi offloading using dual-SSID gateways (xFi XB6, XB7, XB8). The public <code>xfinitywifi</code> SSID offloads mobile data traffic seamlessly for Xfinity Mobile subscribers.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 2: LINES OF BUSINESS (LOB) ================= -->
+    <section id="tab-lob" class="tab-content hidden space-y-4">
+      <div class="xfinity-card rounded-2xl p-4">
+        <h2 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+          <i class="fa-solid fa-layer-group text-purple-400"></i> Lines of Business (LOB)
+        </h2>
+        
+        <!-- Segment Tabs Inside LOB -->
+        <div class="grid grid-cols-3 gap-2 bg-gray-900 p-1 rounded-xl mb-4 text-xs font-semibold">
+          <button onclick="switchLOB('res')" id="btn-lob-res" class="py-2 rounded-lg bg-purple-700 text-white transition-all">Residential</button>
+          <button onclick="switchLOB('bulk')" id="btn-lob-bulk" class="py-2 rounded-lg text-gray-400 hover:text-white transition-all">Bulk / MDU</button>
+          <button onclick="switchLOB('biz')" id="btn-lob-biz" class="py-2 rounded-lg text-gray-400 hover:text-white transition-all">Business</button>
+        </div>
+
+        <!-- LOB Content Panels -->
+        <div id="lob-res" class="lob-panel space-y-3">
+          <span class="badge-purple text-xs px-2 py-0.5 rounded">Mass Market B2C</span>
+          <h3 class="font-bold text-white text-base">Residential Services</h3>
+          <p class="text-xs text-gray-300 leading-relaxed">
+            Direct-to-consumer subscriptions providing home internet, TV streaming, landline voice, home security, and wireless. Features standard self-install kits (SIK) or professional installations with 1 to 5-year price locks.
+          </p>
+          <ul class="text-xs text-gray-400 space-y-1 list-disc pl-4">
+            <li>Target: Single-family homes, individual apartment renters.</li>
+            <li>Billing: Direct monthly subscriber billing.</li>
+            <li>Contract Types: No-contract options vs. promotional term locks.</li>
+          </ul>
+        </div>
+
+        <div id="lob-bulk" class="lob-panel hidden space-y-3">
+          <span class="badge-blue text-xs px-2 py-0.5 rounded">MDU / Multi-Family</span>
+          <h3 class="font-bold text-white text-base">Bulk Communities & Communities Solutions</h3>
+          <p class="text-xs text-gray-300 leading-relaxed">
+            Services provided to Multi-Dwelling Units (MDUs), HOA communities, condos, and student housing under a master service agreement (MSA).
+          </p>
+          <ul class="text-xs text-gray-400 space-y-1 list-disc pl-4">
+            <li><strong>Master Billing:</strong> Property owner or HOA pays a discounted bulk rate for all units via HOA dues.</li>
+            <li><strong>Resident Upgrades:</strong> Residents can add individual premium tiers, higher speeds, or Xfinity Mobile on top of bulk baselines.</li>
+            <li><strong>Managed Wi-Fi:</strong> Property-wide continuous Wi-Fi roaming across common areas, pools, and units.</li>
+          </ul>
+        </div>
+
+        <div id="lob-biz" class="lob-panel hidden space-y-3">
+          <span class="badge-green text-xs px-2 py-0.5 rounded">Comcast Business B2B</span>
+          <h3 class="font-bold text-white text-base">Comcast Business & Enterprise</h3>
+          <p class="text-xs text-gray-300 leading-relaxed">
+            Commercial-grade connectivity tailored for small business (SMB) up to fortune 500 enterprise customers.
+          </p>
+          <ul class="text-xs text-gray-400 space-y-1 list-disc pl-4">
+            <li><strong>SLAs & Uptime:</strong> Dedicated Internet Access (DIA) with 99.99% uptime SLAs and 24/7 dedicated enterprise support.</li>
+            <li><strong>Wireless Backup:</strong> LTE/5G auto-failover gateway backup (Wireless Connect) ensuring zero business downtime.</li>
+            <li><strong>Security & Voice:</strong> SecurityEdge cloud protection, business trunking, and hosted PBX phone systems.</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= TAB 3: RETENTION & CHURN PLAYBOOK ================= -->
+    <section id="tab-retention" class="tab-content hidden space-y-4">
+      <div class="xfinity-card rounded-2xl p-4">
+        <span class="badge-purple text-xs px-2.5 py-1 rounded-full uppercase tracking-wider font-semibold">Customer Loyalty</span>
+        <h2 class="text-xl font-bold text-white mt-2 mb-1">Retention & Churn Strategy</h2>
+        <p class="text-xs text-gray-400 mb-4">Core protocols for reducing customer churn, handling disconnect requests, and applying retention discount matrices.</p>
+
+        <!-- Retention Step-by-Step Methodology -->
+        <div class="space-y-3 text-xs">
+          <div class="bg-gray-900 p-3 rounded-xl border border-gray-800">
+            <div class="flex items-center text-purple-400 font-bold mb-1">
+              <span class="w-5 h-5 bg-purple-900/60 rounded-full flex items-center justify-center text-xs mr-2">1</span>
+              Acknowledge & Empathize (Discovery)
+            </div>
+            <p class="text-gray-300 pl-7">Validate the customer's financial or service frustration without being defensive. Identify root cause: Rate Increase, Competitor Fiber Offer, Moving, or Technical Issues.</p>
+          </div>
+
+          <div class="bg-gray-900 p-3 rounded-xl border border-gray-800">
+            <div class="flex items-center text-purple-400 font-bold mb-1">
+              <span class="w-5 h-5 bg-purple-900/60 rounded-full flex items-center justify-center text-xs mr-2">2</span>
+              Perform Complete Account Audit
+            </div>
+            <p class="text-gray-300 pl-7">Check Xfinity Rewards tier status (Silver, Gold, Platinum, Diamond), active discounts, unused streaming subscriptions, and hardware generation (e.g., swapping old XB3 for XB8).</p>
+          </div>
+
+          <div class="bg-gray-900 p-3 rounded-xl border border-gray-800">
+            <div class="flex items-center text-purple-400 font-bold mb-1">
+              <span class="w-5 h-5 bg-purple-900/60 rounded-full flex items-center justify-center text-xs mr-2">3</span>
+              Value-Add Bundling (Mobile Strategy)
+            </div>
+            <p class="text-gray-300 pl-7">Leverage Mobile line credits. Pitch adding a Mobile line to receive an internet discount (e.g., $10-$20/mo off broadband when adding Xfinity Mobile).</p>
+          </div>
+
+          <div class="bg-gray-900 p-3 rounded-xl border border-gray-800">
+            <div class="flex items-center text-purple-400 font-bold mb-1">
+              <span class="w-5 h-5 bg-purple-900/60 rounded-full flex items-center justify-center text-xs mr-2">4</span>
+              Right-Sizing & Term Re-Commitment
+            </div>
+            <p class="text-gray-300 pl-7">If customer is over-provisioned (e.g., 1.2 Gig tier for single occupant), right-size to 300 Mbps or 500 Mbps and lock in a 1-to-5 year price guarantee.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 4: CORE PRODUCTS DEEP-DIVE ================= -->
+    <section id="tab-services" class="tab-content hidden space-y-4">
+      <div class="xfinity-card rounded-2xl p-4">
+        <h2 class="text-xl font-bold text-white mb-3">Xfinity Core Product Suite</h2>
+        
+        <!-- Accordion Item 1: Internet -->
+        <div class="border-b border-gray-800 py-3">
+          <button onclick="toggleAccordion('acc-internet')" class="w-full flex items-center justify-between text-left focus:outline-none">
+            <span class="font-bold text-purple-300 text-sm"><i class="fa-solid fa-wifi w-5"></i> Xfinity Internet & Hardware</span>
+            <i class="fa-solid fa-chevron-down text-gray-500 text-xs"></i>
+          </button>
+          <div id="acc-internet" class="hidden mt-3 space-y-2 text-xs text-gray-300">
+            <p><strong>Speed Tiers:</strong> Connect (150 Mbps), Connect More (300 Mbps), Fast (500 Mbps), Gigabit (1000 Mbps), Gigabit Plus (1200 Mbps), Gigabit x2 (2000 Mbps).</p>
+            <p><strong>Gateways:</strong></p>
+            <ul class="list-disc pl-4 text-gray-400 space-y-1">
+              <li><strong>XB7:</strong> Wi-Fi 6 (802.11ax), dual-band, 2.5 Gbps Ethernet port.</li>
+              <li><strong>XB8:</strong> Wi-Fi 6E (6 GHz band support), tri-band, lower latency, handles up to 100 connected devices.</li>
+            </ul>
+            <p><strong>xFi Complete:</strong> Includes unlimited data, gateway rental fee, and automatic xFi Pod mesh extender evaluations.</p>
+          </div>
+        </div>
+
+        <!-- Accordion Item 2: Video & TV -->
+        <div class="border-b border-gray-800 py-3">
+          <button onclick="toggleAccordion('acc-tv')" class="w-full flex items-center justify-between text-left focus:outline-none">
+            <span class="font-bold text-purple-300 text-sm"><i class="fa-solid fa-tv w-5"></i> X1 Cable, NOW TV & StreamSaver</span>
+            <i class="fa-solid fa-chevron-down text-gray-500 text-xs"></i>
+          </button>
+          <div id="acc-tv" class="hidden mt-3 space-y-2 text-xs text-gray-300">
+            <p><strong>X1 Entertainment OS:</strong> Voice Remote driven entertainment system integrating traditional linear cable channels with native streaming apps (Netflix, Prime, Disney+).</p>
+            <p><strong>NOW TV:</strong> Low-cost contract-free streaming bundle for internet customers including 45+ live channels plus Peacock Premium.</p>
+            <p><strong>Xfinity StreamSaver™:</strong> Consolidated streaming bundle combining Netflix, Apple TV+, and Peacock Premium at a steep discount.</p>
+          </div>
+        </div>
+
+        <!-- Accordion Item 3: Mobile -->
+        <div class="border-b border-gray-800 py-3">
+          <button onclick="toggleAccordion('acc-mobile')" class="w-full flex items-center justify-between text-left focus:outline-none">
+            <span class="font-bold text-purple-300 text-sm"><i class="fa-solid fa-mobile-screen-button w-5"></i> Xfinity Mobile (MVNO)</span>
+            <i class="fa-solid fa-chevron-down text-gray-500 text-xs"></i>
+          </button>
+          <div id="acc-mobile" class="hidden mt-3 space-y-2 text-xs text-gray-300">
+            <p><strong>Network Model:</strong> Hybrid MVNO utilizing Verizon's 5G / LTE towers combined with automatic seamless authentication onto 23M+ Xfinity Wi-Fi hotspots.</p>
+            <p><strong>Eligibility:</strong> Exclusively available to active Xfinity Internet customers.</p>
+            <p><strong>Plan Options:</strong></p>
+            <ul class="list-disc pl-4 text-gray-400 space-y-1">
+              <li><strong>By the Gig:</strong> Shared pool of data (1GB, 3GB, 10GB) for light data users.</li>
+              <li><strong>Unlimited / Unlimited Plus:</strong> High-speed premium cellular data allocation with hotspot capabilities.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Accordion Item 4: Home Security -->
+        <div class="py-3">
+          <button onclick="toggleAccordion('acc-security')" class="w-full flex items-center justify-between text-left focus:outline-none">
+            <span class="font-bold text-purple-300 text-sm"><i class="fa-solid fa-shield-halved w-5"></i> Xfinity Home Security</span>
+            <i class="fa-solid fa-chevron-down text-gray-500 text-xs"></i>
+          </button>
+          <div id="acc-security" class="hidden mt-3 space-y-2 text-xs text-gray-300">
+            <p><strong>Pro Monitoring vs Self Monitoring:</strong> Professional 24/7 central station dispatch monitoring with cellular backup during power outages, or app-based self-monitoring with Video Recording Cloud storage.</p>
+            <p><strong>Smart Home Integration:</strong> Compatible with Zigbee/Z-Wave smart locks, thermostats, video doorbells, and indoor/outdoor HD cameras.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= TAB 5: GITHUB & PWA SETUP GUIDE ================= -->
+    <section id="tab-github-pwa" class="tab-content hidden space-y-4">
+      <div class="xfinity-card rounded-2xl p-4">
+        <span class="badge-blue text-xs px-2.5 py-1 rounded-full uppercase tracking-wider font-semibold">Deployment Guide</span>
+        <h2 class="text-xl font-bold text-white mt-2 mb-2">Publishing to GitHub Pages</h2>
+        
+        <p class="text-xs text-gray-300 mb-4 leading-relaxed">
+          Follow these step-by-step instructions to create your repository and deploy this PWA web application live online for mobile access.
+        </p>
+
+        <div class="space-y-4 text-xs">
+          <!-- Step 1 -->
+          <div class="bg-gray-900 p-3 rounded-xl border border-gray-800">
+            <h3 class="font-bold text-purple-300 text-sm mb-1">Step 1: Prepare Project Files</h3>
+            <p class="text-gray
